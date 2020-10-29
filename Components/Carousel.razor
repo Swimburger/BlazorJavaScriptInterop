@@ -2,33 +2,17 @@
 @inject IJSRuntime jsRuntime
 <div class="carousel slide" data-ride="carousel" id="@carouselId" @ref="carouselReference">
   <div class="carousel-inner">
-    <div class="carousel-item">
-      <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
-      xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
-      aria-label="Placeholder: First slide">
-        <title>Placeholder</title>
-        <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#555" dy=".3em">First
-          slide</text>
-      </svg>
-    </div>
-    <div class="carousel-item">
-      <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
-      xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
-      aria-label="Placeholder: Second slide">
-        <title>Placeholder</title>
-        <rect width="100%" height="100%" fill="#666"></rect><text x="50%" y="50%" fill="#444" dy=".3em">Second
-          slide</text>
-      </svg>
-    </div>
-    <div class="carousel-item active">
-      <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
-      xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
-      aria-label="Placeholder: Third slide">
-        <title>Placeholder</title>
-        <rect width="100%" height="100%" fill="#555"></rect><text x="50%" y="50%" fill="#333" dy=".3em">Third
-          slide</text>
-      </svg>
-    </div>
+    @for (int i = 1; i <= 10; i++)
+    {
+      <div class="carousel-item @(i == 1 ? "active": "")">
+        <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
+        xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
+        aria-label="Slide @i">
+          <title>Slide @i</title>
+          <rect width="100%" height="100%" fill="#777"></rect><text x="50%" y="50%" fill="#fff" dy=".3em">Slide @i</text>
+        </svg>
+      </div>
+    }
   </div>
   <a class="carousel-control-prev" data-target="#@carouselId" role="button" data-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -41,13 +25,16 @@
 </div>
 
 @code{
-  // required to hook up controls using data-target
-  private string carouselId = Guid.NewGuid().ToString();
+  // prefix id with 'id_' to make sure id's don't start with a number or other invalid character
+  // add Guid to ensure unique-ness but remove '-' as they are invalid characters for JS property names
+  private string carouselId = $"id_{Guid.NewGuid().ToString().Replace("-", "")}";
   private ElementReference carouselReference;
   private DotNetObjectReference<Carousel> dotNetObjectReference;
+
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
-    if(firstRender){
+    if (firstRender)
+    {
       dotNetObjectReference = DotNetObjectReference.Create(this);
       await jsRuntime.InvokeVoidAsync("blazorCarousel.init", carouselId, dotNetObjectReference, carouselReference);
     }
@@ -55,8 +42,8 @@
 
   public void Dispose()
   {
-    // IAsyncDisposable not supported yet
-    Task.Run(() => jsRuntime.InvokeVoidAsync("blazorCarousel.dispose", carouselId)); 
+    // IAsyncDisposable not supported yet in .NET Core 3.1
+    Task.Run(() => jsRuntime.InvokeVoidAsync("blazorCarousel.dispose", carouselId));
     dotNetObjectReference.Dispose();
   }
 }

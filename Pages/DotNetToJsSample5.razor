@@ -1,0 +1,22 @@
+@page "/dotnet-to-js-sample-5"
+@using System.Text.Json
+@inject IJSRuntime jsRuntime
+
+<button type="button" class="btn btn-primary" @onclick="GetWeatherDataUsingJavaScript">
+  Invoke JavaScript function with Promise return value from .NET
+</button>
+<br>
+<br>
+<code>
+  @serializedObject
+</code>
+
+
+@code{
+  private string serializedObject;
+  private async Task GetWeatherDataUsingJavaScript()
+  {
+    var weatherDataObject = await jsRuntime.InvokeAsync<Object>("dotNetToJsSamples.getWeatherData");
+    serializedObject = JsonSerializer.Serialize(weatherDataObject);
+  }
+}

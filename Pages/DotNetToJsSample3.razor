@@ -1,0 +1,18 @@
+@page "/dotnet-to-js-sample-3"
+@inject IJSRuntime jsRuntime
+
+<button type="button" class="btn btn-primary" @onclick="ShowEvalWarningAsync">Run JavaScript from .NET using EVAL</button>
+<div class="eval-warning alert alert-danger font-weight-bold" role="alert"></div>
+
+@code{
+  private async Task ShowEvalWarningAsync()
+  {
+    var warning = "Using <code>eval</code> is a huge security risk." +
+      "<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#Never_use_eval!\">" +
+    " Learn more about the risks of using <code>eval</code> at MDN." +
+    "</a>";
+    // add null; add the end to prevent .NET from trying to serialize return value to object
+    var scriptToEval = string.Format("$('.eval-warning').html('{0}');null;", warning);
+    await jsRuntime.InvokeVoidAsync("eval", scriptToEval);
+  }
+}

@@ -1,5 +1,5 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">BlazorJavascriptInterop</a>
+    <a class="navbar-brand" href="">BlazorJavaScriptInterop</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -7,19 +7,59 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
-        <li class="nav-item px-3">
+        <li class="nav-item px-3 mb-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="dotnet-to-js-sample-1">
+                .NET to JS 1 - Call a JavaScript function with simple parameters from .NET
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="dotnet-to-js-sample-2">
+                .NET to JS 2 - Call a JavaScript function with object parameters from .NET
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="dotnet-to-js-sample-3">
+                .NET to JS 3 - Call 'eval' JavaScript function (dangerous) from .NET
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="dotnet-to-js-sample-4">
+                .NET to JS 4 - Call JavaScript function with return value from .NET
+            </NavLink>
+        </li>
+        <li class="nav-item px-3 mb-3">
+            <NavLink class="nav-link" href="dotnet-to-js-sample-5">
+                .NET to JS 5 - Call JavaScript function returning a promise from .NET
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="js-to-dotnet-sample-1">
+                JS to .NET 1 - Call static .NET methods
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="js-to-dotnet-sample-2">
+                JS to .NET 2 - Call .NET class instance methods
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="js-to-dotnet-sample-3">
+                JS to .NET 3 - Call .NET Blazor component instance method with object return
+            </NavLink>
+        </li>
+        <li class="nav-item px-3 mb-3">
+            <NavLink class="nav-link" href="js-to-dotnet-sample-4">
+                JS to .NET 4 - Call .NET async task method from JavaScript
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="advanced-interop">
+                Advanced - Support multiple Blazor component instances in JavaScript
             </NavLink>
         </li>
     </ul>

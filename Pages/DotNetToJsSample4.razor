@@ -1,0 +1,23 @@
+@page "/dotnet-to-js-sample-4"
+@inject IJSRuntime jsRuntime
+
+<textarea class="form-control" placeholder="Enter message" @ref="textAreaReference"></textarea>
+<br>
+<button type="button" class="btn btn-primary" @onclick="PrintMessageAsync">
+  Get return value from JavaScript function invoked from .NET
+</button>
+<br>
+<br>
+<div class="alert alert-primary" role="alert">
+  Message: @message
+</div>
+
+
+@code{
+  private ElementReference textAreaReference;
+  private string message;
+  private async Task PrintMessageAsync()
+  {
+    message = await jsRuntime.InvokeAsync<string>("dotNetToJsSamples.getValue", textAreaReference);
+  }
+}

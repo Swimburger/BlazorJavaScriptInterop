@@ -1,0 +1,24 @@
+@page "/js-to-dotnet-sample-1"
+
+<button type="button" class="btn btn-primary" onclick="DotNet.invokeMethod('BlazorJavaScriptInterop', 'ConsoleWriteLine', 'Hello from JavaScript')">
+  Invoke static .NET ConsoleWriteLine function from JavaScript
+</button>
+<br>
+<br>
+<button type="button" class="btn btn-primary" onclick="DotNet.invokeMethod('BlazorJavaScriptInterop', 'otherConsoleWriteLine', 'Hello from JavaScript 2')">
+  Invoke static .NET NamedConsoleWriteLine function with alias 'otherConsoleWriteLine' from JavaScript
+</button>
+
+@code{
+  [JSInvokable]
+  public static void ConsoleWriteLine(string message)
+  {
+    Console.WriteLine(message);
+  }
+
+  [JSInvokable("otherConsoleWriteLine")]
+  public static void NamedConsoleWriteLine(string message)
+  {
+    Console.WriteLine(message);
+  }
+}

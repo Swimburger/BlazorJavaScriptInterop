@@ -1,0 +1,35 @@
+@page "/js-to-dotnet-sample-3"
+@implements IDisposable
+@inject IJSRuntime jsRuntime
+
+<button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.printPersonFromDotNet()">Print person from .NET Blazor component instance method</button>
+<div><code id="personCodeBlock"></code></div>
+@code{
+  private DotNetObjectReference<JsToDotNetSample3> dotNetObjectReference;
+
+  protected override Task OnInitializedAsync()
+  {
+    dotNetObjectReference = DotNetObjectReference.Create(this);
+    jsRuntime.InvokeVoidAsync("jsToDotNetSamples.setDotNetReference", dotNetObjectReference);
+    return base.OnInitializedAsync();
+  }
+
+  [JSInvokable]
+  public object GetPerson()
+  {
+    var obj = new
+    {
+      FistName = "Jon",
+      LastName = "Doe",
+      Age = 27,
+      BirthDate = DateTime.Now.AddYears(-27), 
+      LikesDotNet = true
+    };
+    return obj;
+  }
+
+  public void Dispose()
+  {
+    dotNetObjectReference.Dispose();
+  }
+}

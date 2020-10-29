@@ -1,0 +1,40 @@
+@page "/js-to-dotnet-sample-2"
+@implements IDisposable
+@inject IJSRuntime jsRuntime
+
+<button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.printPersonFromDotNet()">Print person from .NET class instance</button>
+<div><code id="personCodeBlock"></code></div>
+@code{
+  private JsToDotNetBridge jsToDotNetBridge = new JsToDotNetBridge();
+  private DotNetObjectReference<JsToDotNetBridge> jsToDotNetBridgeReference;
+
+  protected override Task OnInitializedAsync()
+  {
+    jsToDotNetBridgeReference = DotNetObjectReference.Create(jsToDotNetBridge);
+    jsRuntime.InvokeVoidAsync("jsToDotNetSamples.setDotNetReference", jsToDotNetBridgeReference);
+    return base.OnInitializedAsync();
+  }
+
+  public void Dispose()
+  {
+    jsToDotNetBridgeReference.Dispose();
+  }
+
+  // class embedded for demo purposes, move this class out of your razor component
+  public class JsToDotNetBridge
+  {
+    [JSInvokable]
+    public object GetPerson()
+    {
+      var obj = new
+      {
+        FistName = "Jon",
+        LastName = "Doe",
+        Age = 27,
+        BirthDate = DateTime.Now.AddYears(-27), 
+        LikesDotNet = true
+      };
+      return obj;
+    }
+  }
+}

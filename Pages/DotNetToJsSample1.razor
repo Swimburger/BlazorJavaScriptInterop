@@ -1,0 +1,17 @@
+@page "/dotnet-to-js-sample-1"
+@inject IJSRuntime jsRuntime
+
+<button type="button" class="btn btn-primary" @onclick="PrintMessageAsync">Send message from .NET to JavaScript</button>
+<div class="alert alert-primary" role="alert">
+  Message from .NET to JavaScript:
+  <span class="font-weight-bold" @ref="spanMessage"></span>
+</div>
+
+@code{
+  private ElementReference spanMessage;
+
+  private async Task PrintMessageAsync()
+  {
+    await jsRuntime.InvokeVoidAsync("dotNetToJsSamples.setText", spanMessage, "Hello from .NET");
+  }
+}

@@ -1,0 +1,30 @@
+@page "/js-to-dotnet-sample-4"
+@implements IDisposable
+@inject IJSRuntime jsRuntime
+@inject NavigationManager navigationManager
+
+<button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.getWeatherDataFromDotNet()">Get WeatherData from .NET async task method</button>
+<div><code></code></div>
+@code{
+  private static HttpClient httpClient = new HttpClient();
+  private DotNetObjectReference<JsToDotNetSample4> dotNetObjectReference;
+
+  protected override Task OnInitializedAsync()
+  {
+    dotNetObjectReference = DotNetObjectReference.Create(this);
+    jsRuntime.InvokeVoidAsync("jsToDotNetSamples.setDotNetReference", dotNetObjectReference);
+    return base.OnInitializedAsync();
+  }
+
+  [JSInvokable]
+  public async Task<object> GetWeatherAsync()
+  {
+      var rootUrl = navigationManager.BaseUri;
+      return await httpClient.GetFromJsonAsync<object>($"{rootUrl}/sample-data/weather.json");
+  }
+
+  public void Dispose()
+  {
+    dotNetObjectReference.Dispose();
+  }
+}

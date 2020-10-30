@@ -1,5 +1,7 @@
 @implements IDisposable
+@using Microsoft.Extensions.Logging
 @inject IJSRuntime jsRuntime
+@inject ILogger<Carousel> logger
 <div class="carousel slide" data-ride="carousel" id="@carouselId" @ref="carouselReference">
   <div class="carousel-inner">
     @for (int i = 1; i <= 10; i++)
@@ -38,6 +40,18 @@
       dotNetObjectReference = DotNetObjectReference.Create(this);
       await jsRuntime.InvokeVoidAsync("blazorCarousel.init", carouselId, dotNetObjectReference, carouselReference);
     }
+  }
+
+  [JSInvokable]
+  public void OnSlide(string direction, int from, int to)
+  {
+    logger.LogInformation($"Carousel is sliding from {from} to {to}.");
+  }
+
+  [JSInvokable]
+  public void OnSlid(string direction, int from, int to)
+  {
+    logger.LogInformation($"Carousel slid from {from} to {to}.");
   }
 
   public void Dispose()

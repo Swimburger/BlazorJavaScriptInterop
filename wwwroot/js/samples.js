@@ -16,7 +16,7 @@ window.dotNetToJsSamples = {
         return fetch('/sample-data/weather.json')
             .then(response => response.json());
     }
-}
+};
 
 // JS to .NET samples
 window.jsToDotNetSamples = {
@@ -35,7 +35,7 @@ window.jsToDotNetSamples = {
                 document.querySelector('code').textContent = JSON.stringify(data);
             });
     }
-}
+};
 
 var blazorCarousel = {
     instances: {},
@@ -45,10 +45,16 @@ var blazorCarousel = {
             $carouselNode: $(carouselNode)
         };
         carousel.$carouselNode.carousel();
+        carousel.$carouselNode.on('slide.bs.carousel', function (event) {
+            dotNetReference.invokeMethod("OnSlide", event.direction, event.from, event.to);
+        });
+        carousel.$carouselNode.on('slid.bs.carousel', function (event) {
+            dotNetReference.invokeMethod("OnSlid", event.direction, event.from, event.to);
+        });
         this.instances[carouselId] = carousel;
     },
     dispose: function (carouselId) {
         this.instances[carouselId].$carouselNode.carousel('dispose');
         delete this.instances[carouselId];
     }
-}
+};

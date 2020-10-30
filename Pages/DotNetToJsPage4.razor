@@ -1,3 +1,49 @@
 @page "/dotnet-to-js-sample-4"
 @using BlazorJavaScriptInterop.Components
+<h1>Call JavaScript functions with return value from .NET</h1>
+<p>
+    In addition to the method <code>InvokeVoidAsync</code> on <code>IJSRuntime</code>, there's another method <code>InvokeAsync</code>. <br>
+    <code>InvokeAsync</code> let's you invoke a JavaScript function and receive its return value in .NET. <br>
+    Example: <code>InvokeAsync&lt;string&gt;("computeStringInJavaScript")</code>. <br>
+    These JavaScript functions can also return objects which will be converted into .NET objects.
+</p>
+
 <DotNetToJsSample4 />
+
+<br><br>
+
+<p class="font-weight-bold">JavaScript Source:</p>
+<pre style="color:#000000;background:#ffffff;">window.dotNetToJsSamples = {
+    getValue: <span style="color:#7f0055; font-weight:bold; ">function</span>(node)
+    {
+        <span style="color:#7f0055; font-weight:bold; ">return</span> node.value;
+    }
+};
+</pre>
+
+
+<p class="font-weight-bold">Blazor Source:</p>
+
+<pre style="color:#000000;background:#ffffff;">@@inject IJSRuntime jsRuntime
+
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">textarea</span> class=<span style="color:#2a00ff; ">"form-control"</span> placeholder=<span style="color:#2a00ff; ">"Enter message"</span> @@ref=<span style="color:#2a00ff; ">"textAreaReference"</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">textarea</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> @@onclick=<span style="color:#2a00ff; ">"PrintMessageAsync"</span><span style="color:#7f0055; ">&gt;</span>
+  Get return value from JavaScript function invoked from .NET
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">div</span> class=<span style="color:#2a00ff; ">"alert alert-primary"</span> role=<span style="color:#2a00ff; ">"alert"</span><span style="color:#7f0055; ">&gt;</span>
+  Message: @@message
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">div</span><span style="color:#7f0055; ">&gt;</span>
+
+
+@@code{
+  <span style="color:#7f0055; font-weight:bold; ">private</span> ElementReference textAreaReference;
+  <span style="color:#7f0055; font-weight:bold; ">private</span> <span style="color:#7f0055; font-weight:bold; ">string</span> message;
+  <span style="color:#7f0055; font-weight:bold; ">private</span> async Task PrintMessageAsync()
+  {
+    message = await jsRuntime.InvokeAsync&lt;<span style="color:#7f0055; font-weight:bold; ">string</span>&gt;(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">dotNetToJsSamples.getValue</span><span style="color:#2a00ff; ">"</span>, textAreaReference);
+  }
+}
+</pre>

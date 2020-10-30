@@ -1,3 +1,43 @@
 @page "/dotnet-to-js-sample-1"
 @using BlazorJavaScriptInterop.Components
+<h1>Call JavaScript functions with simple parameters from .NET</h1>
+<p>
+    The <code>InvokeVoidAsync</code> on <code>IJSRuntime</code> allows you to call JavaScript functions without expecting any return value. <br>
+    These functions have to be available on the global <code>window</code> variable. <br>
+    You can use Blazor's dependency injection using the <code>@@inject</code> to get an instance of <code>IJSRuntime</code>.<br>
+    The first parameter of <code>InvokeVoidAsync</code> is the JavaScript function you want to invoke. You can pass as many subsequent parameters and they will be passed to the JavaScript function.<br>
+    <code>ElementReference</code>'s passed to <code>InvokeVoidAsync</code> will automatically be converted to the <code>HTMLElement</code>.
+</p>
+
+<p class="font-weight-bold">Sample:</p>
 <DotNetToJsSample1 />
+
+<p class="font-weight-bold">JavaScript Source:</p>
+<pre style="color:#000000;background:#ffffff;">window.dotNetToJsSamples = {
+    setText: <span style="color:#7f0055; font-weight:bold; ">function</span>(node, text)
+    {
+        node.textContent = text;
+    }
+};
+</pre>
+
+
+<p class="font-weight-bold">Blazor Source:</p>
+<pre style="color:#000000;background:#ffffff;">@@inject IJSRuntime jsRuntime
+
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> @@onclick=<span style="color:#2a00ff; ">"PrintMessageAsync"</span><span style="color:#7f0055; ">&gt;</span>Send message from .NET to JavaScript<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">div</span> class=<span style="color:#2a00ff; ">"alert alert-primary"</span> role=<span style="color:#2a00ff; ">"alert"</span><span style="color:#7f0055; ">&gt;</span>
+  Message from .NET to JavaScript:
+  <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">span</span> class=<span style="color:#2a00ff; ">"font-weight-bold"</span> @@ref=<span style="color:#2a00ff; ">"spanMessage"</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">span</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">div</span><span style="color:#7f0055; ">&gt;</span>
+
+@@code{
+  <span style="color:#7f0055; font-weight:bold; ">private</span> ElementReference spanMessage;
+
+  <span style="color:#7f0055; font-weight:bold; ">private</span> async Task PrintMessageAsync()
+  {
+    await jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">dotNetToJsSamples.setText</span><span style="color:#2a00ff; ">"</span>, spanMessage, <span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Hello from .NET</span><span style="color:#2a00ff; ">"</span>);
+  }
+}
+</pre>

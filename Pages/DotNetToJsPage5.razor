@@ -1,3 +1,44 @@
 @page "/dotnet-to-js-sample-5"
 @using BlazorJavaScriptInterop.Components
+<h1>Call JavaScript functions returning a Promise from .NET</h1>
+<p>
+    In addition to returning simple values and objects from JavaScript functions, these functions can also return a <code>Promise</code>. <br>
+    A <code>Promise</code> in JavaScript is the equivalent of a <code>Task</code> in .NET, though they function slightly different. <br>
+    When calling a JavaScript function from .NET which returns a promise, you can simply <code>await</code> the <code>Task</code> returned by <code>InvokeAsync</code>.<br>
+    So from the perspective of your .NET code, there's no difference between a function returning something immediately or using a <code>Promise</code>.<br>
+</p>
 <DotNetToJsSample5 />
+
+<br><br>
+
+<p class="font-weight-bold">JavaScript Source:</p>
+<pre style="color:#000000;background:#ffffff;">window.dotNetToJsSamples = {
+    getWeatherData: <span style="color:#7f0055; font-weight:bold; ">function</span>(){
+        <span style="color:#7f0055; font-weight:bold; ">return</span> fetch(<span style="color:#2a00ff; ">'</span><span style="color:#2a00ff; ">/sample-data/weather.json</span><span style="color:#2a00ff; ">'</span>)
+            .then(response =&gt; response.json());
+    }
+};
+</pre>
+
+<p class="font-weight-bold">Blazor Source:</p>
+
+<pre style="color:#000000;background:#ffffff;">@@using System.Text.Json
+@@inject IJSRuntime jsRuntime
+
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> @@onclick=<span style="color:#2a00ff; ">"GetWeatherDataUsingJavaScript"</span><span style="color:#7f0055; ">&gt;</span>
+  Invoke JavaScript function with Promise return value from .NET
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">code</span><span style="color:#7f0055; ">&gt;</span>
+  @@serializedObject
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">code</span><span style="color:#7f0055; ">&gt;</span>
+
+@@code{
+  <span style="color:#7f0055; font-weight:bold; ">private</span> <span style="color:#7f0055; font-weight:bold; ">string</span> serializedObject;
+  <span style="color:#7f0055; font-weight:bold; ">private</span> async Task GetWeatherDataUsingJavaScript()
+  {
+    <span style="color:#7f0055; font-weight:bold; ">var</span> weatherDataObject = await jsRuntime.InvokeAsync&lt;Object&gt;(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">dotNetToJsSamples.getWeatherData</span><span style="color:#2a00ff; ">"</span>);
+    serializedObject = JsonSerializer.Serialize(weatherDataObject);
+  }
+}
+</pre>

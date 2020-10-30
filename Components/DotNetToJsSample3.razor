@@ -1,8 +1,8 @@
-@page "/dotnet-to-js-sample-3"
 @inject IJSRuntime jsRuntime
 
 <button type="button" class="btn btn-primary" @onclick="ShowEvalWarningAsync">Run JavaScript from .NET using EVAL</button>
-<div class="eval-warning alert alert-danger font-weight-bold" role="alert"></div>
+<br><br>
+<div class="eval-warning alert alert-danger font-weight-bold" role="alert">[WARNING MESSAGE GOES HERE]</div>
 
 @code{
   private async Task ShowEvalWarningAsync()

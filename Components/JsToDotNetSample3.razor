@@ -1,9 +1,9 @@
-@page "/js-to-dotnet-sample-3"
 @implements IDisposable
 @inject IJSRuntime jsRuntime
 
 <button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.printPersonFromDotNet()">Print person from .NET Blazor component instance method</button>
-<div><code id="personCodeBlock"></code></div>
+<br><br>
+<code id="personCodeBlock"></code>
 @code{
   private DotNetObjectReference<JsToDotNetSample3> dotNetObjectReference;
 

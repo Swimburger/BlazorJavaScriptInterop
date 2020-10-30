@@ -1,8 +1,8 @@
-@page "/dotnet-to-js-sample-2"
 @inject IJSRuntime jsRuntime
 
 <button type="button" class="btn btn-primary" @onclick="PrintDotNetObject">Pass .NET object to JavaScript</button>
-<div><code @ref="codeBlock"></code></div>
+<br><br>
+<code @ref="codeBlock"></code>
 @code{
   private ElementReference codeBlock;
 

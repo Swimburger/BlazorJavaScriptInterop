@@ -1,10 +1,10 @@
-@page "/js-to-dotnet-sample-4"
 @implements IDisposable
 @inject IJSRuntime jsRuntime
 @inject NavigationManager navigationManager
 
 <button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.getWeatherDataFromDotNet()">Get WeatherData from .NET async task method</button>
-<div><code></code></div>
+<br><br>
+<code></code>
 @code{
   private static HttpClient httpClient = new HttpClient();
   private DotNetObjectReference<JsToDotNetSample4> dotNetObjectReference;

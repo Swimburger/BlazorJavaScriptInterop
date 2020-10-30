@@ -1,9 +1,9 @@
-@page "/js-to-dotnet-sample-2"
 @implements IDisposable
 @inject IJSRuntime jsRuntime
 
 <button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.printPersonFromDotNet()">Print person from .NET class instance</button>
-<div><code id="personCodeBlock"></code></div>
+<br><br>
+<code id="personCodeBlock"></code>
 @code{
   private JsToDotNetBridge jsToDotNetBridge = new JsToDotNetBridge();
   private DotNetObjectReference<JsToDotNetBridge> jsToDotNetBridgeReference;

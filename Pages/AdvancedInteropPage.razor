@@ -1,3 +1,140 @@
 @page "/advanced-interop"
 @using BlazorJavaScriptInterop.Components
+
+<h1>Keeping state for multiple Blazor component instances in JavaScript</h1>
+<p>
+    For some Blazor components, you can be certain that there only ever be one instance of that component at a single time. <br>
+    In that case, you can simply store the JavaScript state in a single object and not worry about any collision. <br>
+    Though, usually you should make sure that you can have multiple instances of your Blazor components at a single time. <br>
+    The main trick is to store each component's JavaScript in an object with a unique component ID as the key, and the component's state as the value. <br>
+    Subsequently, for any JavaScript function you want to call, you have to pass this unique component ID so that the JavaScript function can retrieve the correct state and execute its functionality.
+</p>
+<p>
+    The sample below illustrates how you can have multiple <code>Carousel</code> components on a single page, each with their own state in JavaScript. <br>
+    Here's how it works:
+</p>
+<ul>
+    <li>First, you need to create a safe unique ID for the component instace; You can do this using this line: <code>$"id_{Guid.NewGuid().ToString().Replace("-", "")}";</code> </li>
+    <li>
+        Create a JavaScript function that you can call from Blazor to initialize your component and its JavaScript state. 
+        <code>blazorCarousel.init</code> takes in the component ID, a <code>DotNetObjectReference</code>, and an <code>ElementReference</code>.
+        <ul>
+            <li>The component ID will be used as the key to store state on the <code>blazorCarousel.instances</code> object.</li>
+            <li>The <code>DotNetObjectReference</code> will be used to call back into the .NET Blazor component when events occur.</li>
+            <li>The <code>ElementReference</code> will be used to call Bootstrap's Carousel function.</li>
+        </ul>
+        The <code>blazorCarousel.init</code> does the following:
+        <ul>
+            <li>Initialize the Bootstrap carousel by calling the jQuery Bootstrap <code>carousel()</code> function on the jQuery wrapped <code>carouselNode</code>.</li>
+            <li>Hook up a JavaScript callback function to the Carousel 'slide' event. The callback calls into the <code>OnSlide</code> .NET method passing in the event data.</li>
+            <li>Hook up a JavaScript callback function to the Carousel 'slid' event. The callback calls into the <code>OnSlid</code> .NET method passing in the event data.</li>
+            <li>Store state for the Carousel component on the <code>blazorCarousel.instances</code> object, using the component ID as key and the state as value. <br>
+            The state is holding on to the <code>DotNetReference</code> and jQuery wrapped <code>carouselNode</code>.</li>
+        </ul>
+    </li>
+    <li>In the <code>OnAfterRenderAsync</code>, specifically on <code>firstRender</code>, the JavaScript <code>blazorCarousel.init</code> function is called.</li>
+    <li>
+        When the <code>Carousel</code> Blazor component is removed from the application, the <code>Dispose</code> method will be called.
+        Inside of <code>Dispose</code>, the JavaScript <code>blazorCarousel.dispose</code> function is called doing the following:
+        <ul>
+            <li>The jQuery Bootstrap dispose is called like this <code>.carousel('dispose')</code>. This is important to not cause memory leaks.</li>
+            <li>The instance state is removed from the <code>blazorCarousel.instances</code> object using the <code>delete</code> keyword.</li>
+        </ul>
+        Note: <code>IAsyncDisposable</code> would be a better interface to implement since invoking the JavaScript will result in a <code>Task</code>. Unfortunately, IAsyncDisposable is not yet supported, but it will be soon.
+    </li>
+</ul>
+<p>You can find the running sample at the bottom of the page.</p>
+<p class="font-weight-bold">JavaScript Source:</p>
+<pre style="color:#000000;background:#ffffff;">var blazorCarousel = {
+    instances: {},
+    init: function (carouselId, dotNetReference, carouselNode) {
+        var carousel = {
+            dotNetReference: dotNetReference,
+            $carouselNode: $(carouselNode)
+        };
+        carousel.$carouselNode.carousel();
+        carousel.$carouselNode.on('slide.bs.carousel', function (event) {
+            dotNetReference.invokeMethod("OnSlide", event.direction, event.from, event.to);
+        });
+        carousel.$carouselNode.on('slid.bs.carousel', function (event) {
+            dotNetReference.invokeMethod("OnSlid", event.direction, event.from, event.to);
+        });
+        this.instances[carouselId] = carousel;
+    },
+    dispose: function (carouselId) {
+        this.instances[carouselId].$carouselNode.carousel('dispose');
+        delete this.instances[carouselId];
+    }
+};
+</pre>
+
+<p class="font-weight-bold">Blazor Source:</p>
+<pre style="color:#000000;background:#ffffff;">@@implements IDisposable
+@@using Microsoft.Extensions.Logging
+@@inject IJSRuntime jsRuntime
+@@inject ILogger<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; ">Carousel</span><span style="color:#7f0055; ">&gt;</span> logger
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">div</span> class=<span style="color:#2a00ff; ">"carousel slide"</span> data-ride=<span style="color:#2a00ff; ">"carousel"</span> id=<span style="color:#2a00ff; ">"@@carouselId"</span> @@ref=<span style="color:#2a00ff; ">"carouselReference"</span><span style="color:#7f0055; ">&gt;</span>
+  <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">div</span> class=<span style="color:#2a00ff; ">"carousel-inner"</span><span style="color:#7f0055; ">&gt;</span>
+    @@for (int i = 1; i &lt;= 10; i++)
+    {
+      <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">div</span> class=<span style="color:#2a00ff; ">"carousel-item @@(i == 1 ? "</span>active<span style="color:#2a00ff; ">": "</span><span style="color:#2a00ff; ">")"</span><span style="color:#7f0055; ">&gt;</span>
+        <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">svg</span> class=<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">bd-placeholder-img bd-placeholder-img-lg d-block w-100</span><span style="color:#2a00ff; ">"</span> width=<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">800</span><span style="color:#2a00ff; ">"</span> height=<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">400</span><span style="color:#2a00ff; ">"</span><span style="color:#7f0055; ">&gt;</span>
+          <span style="color:#3f7f59; ">&lt;!--</span><span style="color:#3f7f59; "> SVG image content goes here </span><span style="color:#3f7f59; ">--&gt;</span>
+        <span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">svg</span><span style="color:#7f0055; ">&gt;</span>
+      <span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">div</span><span style="color:#7f0055; ">&gt;</span>
+    }
+  <span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">div</span><span style="color:#7f0055; ">&gt;</span>
+  <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">a</span> class=<span style="color:#2a00ff; ">"carousel-control-prev"</span> data-target=<span style="color:#2a00ff; ">"#@@carouselId"</span> role=<span style="color:#2a00ff; ">"button"</span> data-slide=<span style="color:#2a00ff; ">"prev"</span><span style="color:#7f0055; ">&gt;</span>
+    <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">span</span> class=<span style="color:#2a00ff; ">"carousel-control-prev-icon"</span> aria-hidden=<span style="color:#2a00ff; ">"true"</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">span</span><span style="color:#7f0055; ">&gt;</span>
+    <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">span</span> class=<span style="color:#2a00ff; ">"sr-only"</span><span style="color:#7f0055; ">&gt;</span>Previous<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">span</span><span style="color:#7f0055; ">&gt;</span>
+  <span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">a</span><span style="color:#7f0055; ">&gt;</span>
+  <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">a</span> class=<span style="color:#2a00ff; ">"carousel-control-next"</span> data-target=<span style="color:#2a00ff; ">"#@@carouselId"</span> role=<span style="color:#2a00ff; ">"button"</span> data-slide=<span style="color:#2a00ff; ">"next"</span><span style="color:#7f0055; ">&gt;</span>
+    <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">span</span> class=<span style="color:#2a00ff; ">"carousel-control-next-icon"</span> aria-hidden=<span style="color:#2a00ff; ">"true"</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">span</span><span style="color:#7f0055; ">&gt;</span>
+    <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">span</span> class=<span style="color:#2a00ff; ">"sr-only"</span><span style="color:#7f0055; ">&gt;</span>Next<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">span</span><span style="color:#7f0055; ">&gt;</span>
+  <span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">a</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">div</span><span style="color:#7f0055; ">&gt;</span>
+
+@@code{
+  <span style="color:#3f7f59; ">// prefix id with 'id_' to make sure id's don't start with a number or other invalid character</span>
+  <span style="color:#3f7f59; ">// add Guid to ensure unique-ness but remove '-' as they are invalid characters for JS property names</span>
+  <span style="color:#7f0055; font-weight:bold; ">private</span> <span style="color:#7f0055; font-weight:bold; ">string</span> carouselId = $<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">id_{Guid.NewGuid().ToString().Replace(</span><span style="color:#2a00ff; ">"</span>-<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">, </span><span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">)}</span><span style="color:#2a00ff; ">"</span>;
+  <span style="color:#7f0055; font-weight:bold; ">private</span> ElementReference carouselReference;
+  <span style="color:#7f0055; font-weight:bold; ">private</span> DotNetObjectReference&lt;Carousel&gt; dotNetObjectReference;
+
+  <span style="color:#7f0055; font-weight:bold; ">protected</span> <span style="color:#7f0055; font-weight:bold; ">override</span> async Task OnAfterRenderAsync(<span style="color:#7f0055; font-weight:bold; ">bool</span> firstRender)
+  {
+    <span style="color:#7f0055; font-weight:bold; ">if</span> (firstRender)
+    {
+      dotNetObjectReference = DotNetObjectReference.Create(<span style="color:#7f0055; font-weight:bold; ">this</span>);
+      await jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">blazorCarousel.init</span><span style="color:#2a00ff; ">"</span>, carouselId, dotNetObjectReference, carouselReference);
+    }
+  }
+
+  [JSInvokable]
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">void</span> OnSlide(<span style="color:#7f0055; font-weight:bold; ">string</span> direction, <span style="color:#7f0055; font-weight:bold; ">int</span> from, <span style="color:#7f0055; font-weight:bold; ">int</span> to)
+  {
+    logger.LogInformation($<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Carousel is sliding from {from} to {to}.</span><span style="color:#2a00ff; ">"</span>);
+  }
+
+  [JSInvokable]
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">void</span> OnSlid(<span style="color:#7f0055; font-weight:bold; ">string</span> direction, <span style="color:#7f0055; font-weight:bold; ">int</span> from, <span style="color:#7f0055; font-weight:bold; ">int</span> to)
+  {
+    logger.LogInformation($<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Carousel slid from {from} to {to}.</span><span style="color:#2a00ff; ">"</span>);
+  }
+
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">void</span> Dispose()
+  {
+    <span style="color:#3f7f59; ">// IAsyncDisposable not supported yet in .NET Core 3.1</span>
+    Task.Run(() =&gt; jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">blazorCarousel.dispose</span><span style="color:#2a00ff; ">"</span>, carouselId));
+    dotNetObjectReference.Dispose();
+  }
+}
+</pre>
+
+<p>
+    <span class="font-weight-bold">Sample:</span>
+    Using this technique to store multiple components state's, you can now have multiple instances of the same component on the same page.
+    Below are two <code>Carousel</code> components without any interference between the two.
+</p>
 <AdvancedInteropSample />
+

@@ -1,3 +1,40 @@
 @page "/js-to-dotnet-sample-1"
 @using BlazorJavaScriptInterop.Components
+<h1>Call static .NET method from JS</h1>
+<p>
+    Blazor will add a global variable <code>DotNet</code> to the JavaScript <code>window</code> object. <br>
+    Using <code>DotNet.invokeMethod</code> and <code>DotNet.invokeMethodAsync</code> you can invoke public static .NET methods that have been marked with the <code>JSInvokable</code> attribute. <br>
+    The <code>JSInvokable</code> attribute accepts an argument to specify which name you can use to invoke the method from JavaScript. <br>
+    To see the result of this sample, open the browser DevTools and observe the console output. 
+</p>
+
 <JsToDotNetSample1 />
+
+<br><br>
+
+<p><span class="font-weight-bold">Blazor Source:</span><br>
+Note the usage of the JavaScript <code>onclick</code> attribute instead of the Blazor <code>@@onclick</code> attribute.</p>
+
+<pre style="color:#000000;background:#ffffff;"><span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> onclick=<span style="color:#2a00ff; ">"DotNet.invokeMethod('BlazorJavaScriptInterop', 'ConsoleWriteLine', 'Hello from JavaScript')"</span><span style="color:#7f0055; ">&gt;</span>
+  Call static .NET ConsoleWriteLine function from JavaScript
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> onclick=<span style="color:#2a00ff; ">"DotNet.invokeMethod('BlazorJavaScriptInterop', 'otherConsoleWriteLine', 'Hello from JavaScript 2')"</span><span style="color:#7f0055; ">&gt;</span>
+  Call static .NET NamedConsoleWriteLine function  named 'otherConsoleWriteLine' from JavaScript
+<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
+
+@@code{
+  [JSInvokable]
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">static</span> <span style="color:#7f0055; font-weight:bold; ">void</span> ConsoleWriteLine(<span style="color:#7f0055; font-weight:bold; ">string</span> message)
+  {
+    Console.WriteLine(message);
+  }
+
+  [JSInvokable(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">otherConsoleWriteLine</span><span style="color:#2a00ff; ">"</span>)]
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">static</span> <span style="color:#7f0055; font-weight:bold; ">void</span> NamedConsoleWriteLine(<span style="color:#7f0055; font-weight:bold; ">string</span> message)
+  {
+    Console.WriteLine(message);
+  }
+}
+</pre>

@@ -1,3 +1,93 @@
 @page "/js-to-dotnet-sample-2"
 @using BlazorJavaScriptInterop.Components
+
+<h1>Call .NET class instance methods from JavaScript</h1>
+<p>
+    In addition to static .NET methods, you can also call instance methods on .NET objects. <br>
+    To be able to invoke those instance methods, you need a reference to the .NET object first. <br>
+    To obtain a reference to the .NET object in JavaScript, do the following:
+</p>
+<ol>
+    <li>In .NET, create a <code>DotNetObjectReference</code> instance calling <code>DotNetObjectReference.Create</code> and passing the object you want to reference as a parameter.</li>
+    <li>Use <code>IJSRuntime</code> to call a JavaScript function and pass the <code>DotNetObjectReference</code> as a parameter.</li>
+    <li>In JavaScript, store the object reference so you can call its instance methods later.</li>
+</ol>
+<p>
+    To call the instance methods on the object reference, use the <code>invokeMethod</code> and <code>invokeMethodAsync</code> function. They work the same as they do on the <code>DotNet</code> object.
+</p>
+<p>
+    The sample below does the following:
+</p>
+<ol>
+    <li>Create an instance of <code>JsToDotNetBridge</code>. This class has a method <code>GetPerson</code> marked with a <code>JSInvokable</code> attribute. The method returns an anonymous object representing a person.</li>
+    <li>Create a <code>DotNetObjectReference</code> for the <code>JsToDotNetBridge</code> instance using <code>DotNetObjectReference.Create(jsToDotNetBridge);</code>.</li>
+    <li>Invoke the JavaScript function <code>jsToDotNetSamples.setDotNetReference</code> which accepts the object reference and stores it.</li>
+    <li>When the button below is clicked, <code>jsToDotNetSamples.printPersonFromDotNet</code> will be called which invokes the <code>JsToDotNetBridge.GetPerson</code> instance method.</li>
+    <li>The method returns an object which is converted into JSON to print below the button.</li>
+</ol>
+<p>
+    Note: You have to make sure to dispose of <code>DotNetObjectReference</code>. In the sample, the Blazor component implements the <code>IDisposable</code> interface and disposes of the object reference in the <code>Dispose</code> method.
+</p>
+
 <JsToDotNetSample2 />
+
+<br><br>
+
+<p class="font-weight-bold">JavaScript Source:</p>
+<pre style="color:#000000;background:#ffffff;">window.jsToDotNetSamples = {
+    dotNetReference: <span style="color:#7f0055; font-weight:bold; ">null</span>,
+    setDotNetReference: <span style="color:#7f0055; font-weight:bold; ">function</span>(dotNetReference)
+    {
+        <span style="color:#7f0055; font-weight:bold; ">this</span>.dotNetReference = dotNetReference;
+    },
+    printPersonFromDotNet: <span style="color:#7f0055; font-weight:bold; ">function</span>(){
+        <span style="color:#7f0055; font-weight:bold; ">var</span> person = <span style="color:#7f0055; font-weight:bold; ">this</span>.dotNetReference.invokeMethod(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">GetPerson</span><span style="color:#2a00ff; ">"</span>);
+        document.getElementById(<span style="color:#2a00ff; ">'</span><span style="color:#2a00ff; ">personCodeBlock</span><span style="color:#2a00ff; ">'</span>).textContent = JSON.<span style="color:#7f0055; font-weight:bold; ">stringify</span>(person);
+    }
+};
+</pre>
+
+
+<p class="font-weight-bold">Blazor Source:</p>
+<pre style="color:#000000;background:#ffffff;">@@implements IDisposable
+@@inject IJSRuntime jsRuntime
+
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> onclick=<span style="color:#2a00ff; ">"jsToDotNetSamples.printPersonFromDotNet()"</span><span style="color:#7f0055; ">&gt;</span>Print person from .NET class instance<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">code</span> id=<span style="color:#2a00ff; ">"personCodeBlock"</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">code</span><span style="color:#7f0055; ">&gt;</span>
+
+@@code{
+  <span style="color:#7f0055; font-weight:bold; ">private</span> JsToDotNetBridge jsToDotNetBridge = <span style="color:#7f0055; font-weight:bold; ">new</span> JsToDotNetBridge();
+  <span style="color:#7f0055; font-weight:bold; ">private</span> DotNetObjectReference&lt;JsToDotNetBridge&gt; jsToDotNetBridgeReference;
+
+  <span style="color:#7f0055; font-weight:bold; ">protected</span> <span style="color:#7f0055; font-weight:bold; ">override</span> Task OnInitializedAsync()
+  {
+    jsToDotNetBridgeReference = DotNetObjectReference.Create(jsToDotNetBridge);
+    jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">jsToDotNetSamples.setDotNetReference</span><span style="color:#2a00ff; ">"</span>, jsToDotNetBridgeReference);
+    <span style="color:#7f0055; font-weight:bold; ">return</span> <span style="color:#7f0055; font-weight:bold; ">base</span>.OnInitializedAsync();
+  }
+
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">void</span> Dispose()
+  {
+    jsToDotNetBridgeReference?.Dispose();
+  }
+
+  <span style="color:#3f7f59; ">// class embedded for demo purposes, move this class out of your razor component</span>
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">class</span> JsToDotNetBridge
+  {
+    [JSInvokable]
+    <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">object</span> GetPerson()
+    {
+      <span style="color:#7f0055; font-weight:bold; ">var</span> obj = <span style="color:#7f0055; font-weight:bold; ">new</span>
+      {
+        FistName = <span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Jon</span><span style="color:#2a00ff; ">"</span>,
+        LastName = <span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Doe</span><span style="color:#2a00ff; ">"</span>,
+        Age = 27,
+        BirthDate = DateTime.Now.AddYears(-27), 
+        LikesDotNet = <span style="color:#7f0055; font-weight:bold; ">true</span>
+      };
+      <span style="color:#7f0055; font-weight:bold; ">return</span> obj;
+    }
+  }
+}
+</pre>

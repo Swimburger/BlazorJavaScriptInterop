@@ -1,3 +1,67 @@
 @page "/js-to-dotnet-sample-3"
 @using BlazorJavaScriptInterop.Components
+<h1>Call .NET Blazor component instance methods from JavaScript</h1>
+<p>
+    The previous sample created a dedicated class with instance methods to be called from JavaScript. <br>
+    You can simplify this by creating a <code>DotNetObjectReference</code> of the Blazor component class. <br>
+    Simply define instance methods on your Blazor component and mark them with the <code>JSInvokable</code> attribute. <br>
+    Instead of creating a new object and passing it to <code>DotNetObjectReference.Create</code>, simply pass <code>this</code> to create a reference to the Blazor component instance. <br>
+    After creating the reference, pass it as a parameter when invoking JavaScript and have the JavaScript function store the object reference.
+</p>
 <JsToDotNetSample3 />
+<br><br>
+
+<p class="font-weight-bold">JavaScript Source:</p>
+<pre style="color:#000000;background:#ffffff;">window.jsToDotNetSamples = {
+    dotNetReference: <span style="color:#7f0055; font-weight:bold; ">null</span>,
+    setDotNetReference: <span style="color:#7f0055; font-weight:bold; ">function</span>(dotNetReference)
+    {
+        <span style="color:#7f0055; font-weight:bold; ">this</span>.dotNetReference = dotNetReference;
+    },
+    printPersonFromDotNet: <span style="color:#7f0055; font-weight:bold; ">function</span>(){
+        <span style="color:#7f0055; font-weight:bold; ">var</span> person = <span style="color:#7f0055; font-weight:bold; ">this</span>.dotNetReference.invokeMethod(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">GetPerson</span><span style="color:#2a00ff; ">"</span>);
+        document.getElementById(<span style="color:#2a00ff; ">'</span><span style="color:#2a00ff; ">personCodeBlock</span><span style="color:#2a00ff; ">'</span>).textContent = JSON.<span style="color:#7f0055; font-weight:bold; ">stringify</span>(person);
+    }
+};
+</pre>
+
+
+<p class="font-weight-bold">Blazor Source:</p>
+
+<pre style="color:#000000;background:#ffffff;">@@implements IDisposable
+@@inject IJSRuntime jsRuntime
+
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> onclick=<span style="color:#2a00ff; ">"jsToDotNetSamples.printPersonFromDotNet()"</span><span style="color:#7f0055; ">&gt;</span>Print person from .NET Blazor component instance method<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
+<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">code</span> id=<span style="color:#2a00ff; ">"personCodeBlock"</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">code</span><span style="color:#7f0055; ">&gt;</span>
+
+@@code{
+  <span style="color:#7f0055; font-weight:bold; ">private</span> DotNetObjectReference&lt;JsToDotNetSample3&gt; dotNetObjectReference;
+
+  <span style="color:#7f0055; font-weight:bold; ">protected</span> <span style="color:#7f0055; font-weight:bold; ">override</span> Task OnInitializedAsync()
+  {
+    dotNetObjectReference = DotNetObjectReference.Create(<span style="color:#7f0055; font-weight:bold; ">this</span>);
+    jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">jsToDotNetSamples.setDotNetReference</span><span style="color:#2a00ff; ">"</span>, dotNetObjectReference);
+    <span style="color:#7f0055; font-weight:bold; ">return</span> <span style="color:#7f0055; font-weight:bold; ">base</span>.OnInitializedAsync();
+  }
+
+  [JSInvokable]
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">object</span> GetPerson()
+  {
+    <span style="color:#7f0055; font-weight:bold; ">var</span> obj = <span style="color:#7f0055; font-weight:bold; ">new</span>
+    {
+      FistName = <span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Jon</span><span style="color:#2a00ff; ">"</span>,
+      LastName = <span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Doe</span><span style="color:#2a00ff; ">"</span>,
+      Age = 27,
+      BirthDate = DateTime.Now.AddYears(-27), 
+      LikesDotNet = <span style="color:#7f0055; font-weight:bold; ">true</span>
+    };
+    <span style="color:#7f0055; font-weight:bold; ">return</span> obj;
+  }
+
+  <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">void</span> Dispose()
+  {
+    dotNetObjectReference.Dispose();
+  }
+}
+</pre>

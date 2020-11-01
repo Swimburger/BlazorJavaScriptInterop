@@ -31,8 +31,8 @@ window.jsToDotNetSamples = {
     },
     getWeatherDataFromDotNet: function(node){
         this.dotNetReference.invokeMethodAsync('GetWeatherAsync')
-            .then(data => {
-                document.querySelector('code').textContent = JSON.stringify(data);
+            .then(weatherData => {
+                document.getElementById('weatherCodeBlock').textContent = JSON.stringify(weatherData);
             });
     }
 };

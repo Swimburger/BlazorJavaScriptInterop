@@ -4,6 +4,7 @@
 <button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.printPersonFromDotNet()">Print person from .NET class instance</button>
 <br><br>
 <code id="personCodeBlock"></code>
+
 @code{
   private JsToDotNetBridge jsToDotNetBridge = new JsToDotNetBridge();
   private DotNetObjectReference<JsToDotNetBridge> jsToDotNetBridgeReference;
@@ -17,7 +18,7 @@
 
   public void Dispose()
   {
-    jsToDotNetBridgeReference.Dispose();
+    jsToDotNetBridgeReference?.Dispose();
   }
 
   // class embedded for demo purposes, move this class out of your razor component

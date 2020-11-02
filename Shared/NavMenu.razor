@@ -1,8 +1,15 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Blazor JavaScript Interop Samples</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
+    <a class="navbar-brand" href="" >
+        <span class="d-inline-block d-sm-none">
+            Blazor JS Interop Samples   
+        </span>
+         <span class="d-none d-sm-inline-block">
+            Blazor JavaScript Interop Samples   
+        </span>
+    </a>
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">

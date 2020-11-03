@@ -1,4 +1,4 @@
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 
 <button type="button" class="btn btn-primary" @onclick="PrintDotNetObject">Pass .NET object to JavaScript</button>
 <br><br>
@@ -15,6 +15,6 @@
       BirthDate = DateTime.Now.AddYears(-27), 
       LikesDotNet = true,
     };
-    await jsRuntime.InvokeVoidAsync("dotNetToJsSamples.printDotNetObject", codeBlock, obj);
+    await js.InvokeVoidAsync("dotNetToJsSamples.printDotNetObject", codeBlock, obj);
   }
 }

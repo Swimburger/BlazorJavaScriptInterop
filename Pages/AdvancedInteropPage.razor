@@ -71,7 +71,7 @@
 <p class="font-weight-bold">Blazor Source:</p>
 <pre style="color:#000000;background:#ffffff;">@@implements IDisposable
 @@using Microsoft.Extensions.Logging
-@@inject IJSRuntime jsRuntime
+@@inject IJSRuntime js
 @@inject ILogger<span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; ">Carousel</span><span style="color:#7f0055; ">&gt;</span> logger
 <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">div</span> class=<span style="color:#2a00ff; ">"carousel slide"</span> data-ride=<span style="color:#2a00ff; ">"carousel"</span> id=<span style="color:#2a00ff; ">"@@carouselId"</span> @@ref=<span style="color:#2a00ff; ">"carouselReference"</span><span style="color:#7f0055; ">&gt;</span>
   <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">div</span> class=<span style="color:#2a00ff; ">"carousel-inner"</span><span style="color:#7f0055; ">&gt;</span>
@@ -106,7 +106,7 @@
     <span style="color:#7f0055; font-weight:bold; ">if</span> (firstRender)
     {
       dotNetObjectReference = DotNetObjectReference.Create(<span style="color:#7f0055; font-weight:bold; ">this</span>);
-      await jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">blazorCarousel.init</span><span style="color:#2a00ff; ">"</span>, carouselId, dotNetObjectReference, carouselReference);
+      await js.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">blazorCarousel.init</span><span style="color:#2a00ff; ">"</span>, carouselId, dotNetObjectReference, carouselReference);
     }
   }
 
@@ -125,7 +125,7 @@
   <span style="color:#7f0055; font-weight:bold; ">public</span> <span style="color:#7f0055; font-weight:bold; ">void</span> Dispose()
   {
     <span style="color:#3f7f59; ">// IAsyncDisposable not supported yet in .NET Core 3.1</span>
-    Task.Run(() =&gt; jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">blazorCarousel.dispose</span><span style="color:#2a00ff; ">"</span>, carouselId));
+    Task.Run(() =&gt; js.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">blazorCarousel.dispose</span><span style="color:#2a00ff; ">"</span>, carouselId));
     dotNetObjectReference.Dispose();
   }
 }

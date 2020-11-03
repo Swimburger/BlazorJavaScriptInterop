@@ -1,5 +1,5 @@
 @using System.Text.Json
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 
 <button type="button" class="btn btn-primary" @onclick="GetWeatherDataUsingJavaScript">
   Invoke JavaScript function with Promise return value from .NET
@@ -13,7 +13,7 @@
   private string serializedObject;
   private async Task GetWeatherDataUsingJavaScript()
   {
-    var weatherDataObject = await jsRuntime.InvokeAsync<Object>("dotNetToJsSamples.getWeatherData");
+    var weatherDataObject = await js.InvokeAsync<Object>("dotNetToJsSamples.getWeatherData");
     serializedObject = JsonSerializer.Serialize(weatherDataObject);
   }
 }

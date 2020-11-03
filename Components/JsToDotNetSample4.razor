@@ -1,5 +1,5 @@
 @implements IDisposable
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 @inject NavigationManager navigationManager
 
 <button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.getWeatherDataFromDotNet()">Get WeatherData from .NET async task method</button>
@@ -13,7 +13,7 @@
   protected override Task OnInitializedAsync()
   {
     dotNetObjectReference = DotNetObjectReference.Create(this);
-    jsRuntime.InvokeVoidAsync("jsToDotNetSamples.setDotNetReference", dotNetObjectReference);
+    js.InvokeVoidAsync("jsToDotNetSamples.setDotNetReference", dotNetObjectReference);
     return base.OnInitializedAsync();
   }
 

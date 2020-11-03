@@ -1,4 +1,4 @@
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 
 <button type="button" class="btn btn-primary" @onclick="ShowEvalWarningAsync">Run JavaScript from .NET using EVAL</button>
 <br><br>
@@ -13,6 +13,6 @@
     "</a>";
     // add null; add the end to prevent .NET from trying to serialize return value to object
     var scriptToEval = string.Format("$('.eval-warning').html('{0}');null;", warning);
-    await jsRuntime.InvokeVoidAsync("eval", scriptToEval);
+    await js.InvokeVoidAsync("eval", scriptToEval);
   }
 }

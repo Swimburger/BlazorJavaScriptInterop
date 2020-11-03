@@ -23,7 +23,7 @@
 
 
 <p class="font-weight-bold">Blazor Source:</p>
-<pre style="color:#000000;background:#ffffff;">@@inject IJSRuntime jsRuntime
+<pre style="color:#000000;background:#ffffff;">@@inject IJSRuntime js
 
 <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">button</span> type=<span style="color:#2a00ff; ">"button"</span> class=<span style="color:#2a00ff; ">"btn btn-primary"</span> @@onclick=<span style="color:#2a00ff; ">"PrintMessageAsync"</span><span style="color:#7f0055; ">&gt;</span>Send message from .NET to JavaScript<span style="color:#7f0055; ">&lt;/</span><span style="color:#7f0055; font-weight:bold; ">button</span><span style="color:#7f0055; ">&gt;</span>
 <span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span><span style="color:#7f0055; ">&lt;</span><span style="color:#7f0055; font-weight:bold; ">br</span><span style="color:#7f0055; ">&gt;</span>
@@ -37,7 +37,7 @@
 
   <span style="color:#7f0055; font-weight:bold; ">private</span> async Task PrintMessageAsync()
   {
-    await jsRuntime.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">dotNetToJsSamples.setText</span><span style="color:#2a00ff; ">"</span>, spanMessage, <span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Hello from .NET</span><span style="color:#2a00ff; ">"</span>);
+    await js.InvokeVoidAsync(<span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">dotNetToJsSamples.setText</span><span style="color:#2a00ff; ">"</span>, spanMessage, <span style="color:#2a00ff; ">"</span><span style="color:#2a00ff; ">Hello from .NET</span><span style="color:#2a00ff; ">"</span>);
   }
 }
 </pre>

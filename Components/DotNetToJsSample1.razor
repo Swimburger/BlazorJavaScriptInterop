@@ -1,4 +1,4 @@
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 
 <button type="button" class="btn btn-primary" @onclick="PrintMessageAsync">Send message from .NET to JavaScript</button>
 <br><br>
@@ -12,6 +12,6 @@
 
   private async Task PrintMessageAsync()
   {
-    await jsRuntime.InvokeVoidAsync("dotNetToJsSamples.setText", spanMessage, "Hello from .NET");
+    await js.InvokeVoidAsync("dotNetToJsSamples.setText", spanMessage, "Hello from .NET");
   }
 }

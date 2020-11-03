@@ -1,5 +1,5 @@
 @implements IDisposable
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 
 <button type="button" class="btn btn-primary" onclick="jsToDotNetSamples.printPersonFromDotNet()">Print person from .NET Blazor component instance method</button>
 <br><br>
@@ -11,7 +11,7 @@
   protected override Task OnInitializedAsync()
   {
     dotNetObjectReference = DotNetObjectReference.Create(this);
-    jsRuntime.InvokeVoidAsync("jsToDotNetSamples.setDotNetReference", dotNetObjectReference);
+    js.InvokeVoidAsync("jsToDotNetSamples.setDotNetReference", dotNetObjectReference);
     return base.OnInitializedAsync();
   }
 

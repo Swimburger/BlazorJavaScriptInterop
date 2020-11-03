@@ -1,4 +1,4 @@
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 
 <textarea class="form-control" placeholder="Enter message" @ref="textAreaReference"></textarea>
 <br>
@@ -17,6 +17,6 @@
   private string message;
   private async Task PrintMessageAsync()
   {
-    message = await jsRuntime.InvokeAsync<string>("dotNetToJsSamples.getValue", textAreaReference);
+    message = await js.InvokeAsync<string>("dotNetToJsSamples.getValue", textAreaReference);
   }
 }

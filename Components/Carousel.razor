@@ -1,6 +1,6 @@
 @implements IDisposable
 @using Microsoft.Extensions.Logging
-@inject IJSRuntime jsRuntime
+@inject IJSRuntime js
 @inject ILogger<Carousel> logger
 <div class="carousel slide" data-ride="carousel" id="@carouselId" @ref="carouselReference">
   <div class="carousel-inner">
@@ -38,7 +38,7 @@
     if (firstRender)
     {
       dotNetObjectReference = DotNetObjectReference.Create(this);
-      await jsRuntime.InvokeVoidAsync("blazorCarousel.init", carouselId, dotNetObjectReference, carouselReference);
+      await js.InvokeVoidAsync("blazorCarousel.init", carouselId, dotNetObjectReference, carouselReference);
     }
   }
 
@@ -57,7 +57,7 @@
   public void Dispose()
   {
     // IAsyncDisposable not supported yet in .NET Core 3.1
-    Task.Run(() => jsRuntime.InvokeVoidAsync("blazorCarousel.dispose", carouselId));
+    Task.Run(() => js.InvokeVoidAsync("blazorCarousel.dispose", carouselId));
     dotNetObjectReference.Dispose();
   }
 }

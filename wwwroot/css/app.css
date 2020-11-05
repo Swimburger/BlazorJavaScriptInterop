@@ -226,7 +226,7 @@ app {
   width: 100%;
 }
 
-app > div {
+app > div.no-layout {
   width: 100%;
 }
 

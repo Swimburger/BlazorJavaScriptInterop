@@ -16,7 +16,7 @@ a,
   border-color: #1861ac;
 }
 
-app {
+#app {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -155,7 +155,7 @@ app {
 }
 
 @media (min-width: 768px) {
-  app {
+  #app {
     flex-direction: row;
   }
 
@@ -220,13 +220,13 @@ body {
   display: flex;
 }
 
-app {
+#app {
   flex: 1;
   max-width: 100%;
   width: 100%;
 }
 
-app > div.no-layout {
+#app > div.no-layout {
   width: 100%;
 }
 

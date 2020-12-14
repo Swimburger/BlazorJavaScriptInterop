@@ -58,3 +58,26 @@ var blazorCarousel = {
         delete this.instances[carouselId];
     }
 };
+
+// for .NET 5 with IJSObjectReference
+var createBlazorCarousel = function(){
+    return {
+        dotNetReference: null,
+        $carouselNode: null,
+        init: function (dotNetReference, carouselNode) {
+            this.dotNetReference = dotNetReference;
+            this.$carouselNode = $(carouselNode);
+
+            this.$carouselNode.carousel();
+            this.$carouselNode.on('slide.bs.carousel', function (event) {
+                dotNetReference.invokeMethod("OnSlide", event.direction, event.from, event.to);
+            });
+            this.$carouselNode.on('slid.bs.carousel', function (event) {
+                dotNetReference.invokeMethod("OnSlid", event.direction, event.from, event.to);
+            });
+        },
+        dispose: function () {
+            this.$carouselNode.carousel('dispose');
+        }
+    }
+}

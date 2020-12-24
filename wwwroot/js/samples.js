@@ -29,7 +29,7 @@ window.jsToDotNetSamples = {
         var person = this.dotNetReference.invokeMethod("GetPerson");
         document.getElementById('personCodeBlock').textContent = JSON.stringify(person);
     },
-    getWeatherDataFromDotNet: function(node){
+    getWeatherDataFromDotNet: function(){
         this.dotNetReference.invokeMethodAsync('GetWeatherAsync')
             .then(weatherData => {
                 document.getElementById('weatherCodeBlock').textContent = JSON.stringify(weatherData);
